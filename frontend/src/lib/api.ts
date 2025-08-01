@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-const API_BASE_URL = 'http://localhost:8081/api';
+const API_BASE_URL = 'http://localhost:8000/api';
 
 // Create axios instance
 const api = axios.create({
@@ -75,6 +75,26 @@ export const authApi = {
 
   getProtectedMessage: async (): Promise<string> => {
     const response = await api.get('/test/protected');
+    return response.data;
+  },
+
+  checkPermissions: async (): Promise<any> => {
+    const response = await api.get('/roles/check-permissions');
+    return response.data;
+  },
+
+  getAdminData: async (): Promise<any> => {
+    const response = await api.get('/roles/admin');
+    return response.data;
+  },
+
+  getEmployerData: async (): Promise<any> => {
+    const response = await api.get('/roles/employer');
+    return response.data;
+  },
+
+  getManagerData: async (): Promise<any> => {
+    const response = await api.get('/roles/manager');
     return response.data;
   },
 };

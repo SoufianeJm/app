@@ -36,7 +36,7 @@ public class User implements UserDetails {
     private String lastName;
     
     @Enumerated(EnumType.STRING)
-    private Role role = Role.EMPLOYEE;
+    private Role role = Role.MANAGER;
     
     @Column(name = "is_active")
     private Boolean isActive = true;
@@ -95,6 +95,6 @@ public class User implements UserDetails {
     }
     
     public enum Role {
-        ADMIN, HR, MANAGER, EMPLOYEE
+        ADMIN, EMPLOYER, MANAGER
     }
 }

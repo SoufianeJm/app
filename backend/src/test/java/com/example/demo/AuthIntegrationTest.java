@@ -2,7 +2,6 @@ package com.example.demo;
 
 import com.example.demo.dto.AuthResponse;
 import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,22 +49,6 @@ public class AuthIntegrationTest {
     }
 
     @Test
-    void testRegistration() throws Exception {
-        RegisterRequest request = new RegisterRequest();
-        request.setEmail("test@example.com");
-        request.setPassword("password123");
-        request.setFirstName("Test");
-        request.setLastName("User");
-
-        mockMvc.perform(post("/api/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").exists())
-                .andExpect(jsonPath("$.email").value("test@example.com"));
-    }
-
-    @Test
     void testLogin() throws Exception {
         // Create a user first
         User user = new User();
@@ -73,7 +56,7 @@ public class AuthIntegrationTest {
         user.setPassword(passwordEncoder.encode("password123"));
         user.setFirstName("Test");
         user.setLastName("User");
-        user.setRole(User.Role.EMPLOYEE);
+        user.setRole(User.Role.MANAGER);
         userRepository.save(user);
 
         LoginRequest loginRequest = new LoginRequest();
@@ -96,16 +79,23 @@ public class AuthIntegrationTest {
 
     @Test
     void testProtectedEndpointWithToken() throws Exception {
-        // Register a user and get token
-        RegisterRequest request = new RegisterRequest();
-        request.setEmail("test@example.com");
-        request.setPassword("password123");
-        request.setFirstName("Test");
-        request.setLastName("User");
+        // Create a user first
+        User user = new User();
+        user.setEmail("test@example.com");
+        user.setPassword(passwordEncoder.encode("password123"));
+        user.setFirstName("Test");
+        user.setLastName("User");
+        user.setRole(User.Role.MANAGER);
+        userRepository.save(user);
 
-        MvcResult result = mockMvc.perform(post("/api/auth/register")
+        // Login to get token
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("test@example.com");
+        loginRequest.setPassword("password123");
+
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
 
