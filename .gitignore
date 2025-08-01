@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Production builds
+frontend/build/
+frontend/.next/
+backend/target/
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.staging
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database files
+*.sqlite
+*.db
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+
+# Maven
+backend/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# Next.js
+frontend/.next/
+frontend/out/
+
+# Package managers
+package-lock.json
+yarn.lock
+frontend/package-lock.json
+frontend/yarn.lock
+
+# Temporary files
+*.tmp
+*.temp
