@@ -43,12 +43,6 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface RegisterRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-}
 
 export interface AuthResponse {
   token: string;
@@ -73,10 +67,6 @@ export const authApi = {
     return response.data;
   },
 
-  register: async (data: RegisterRequest): Promise<AuthResponse> => {
-    const response = await api.post('/auth/register', data);
-    return response.data;
-  },
 
   getUserInfo: async (): Promise<User> => {
     const response = await api.get('/test/user-info');

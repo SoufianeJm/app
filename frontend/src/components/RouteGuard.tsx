@@ -11,31 +11,40 @@ interface RouteGuardProps {
 }
 
 export default function RouteGuard({ children, requireAuth = false }: RouteGuardProps) {
-  const { user, isMounted } = useAuth()
+  const { user, isLoading, isMounted } = useAuth()
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
+  const [isRouteLoading, setIsRouteLoading] = useState(true)
+  const [hasRedirected, setHasRedirected] = useState(false)
 
   useEffect(() => {
-    if (!isMounted) return;   // Wait for client-side mounting
+    if (!isMounted || isLoading || hasRedirected) return
 
     const token = Cookies.get('token')
+    const isAuthenticated = !!(token && user)
 
-    if (requireAuth && !token) {
-      router.push('/login')
+    // Airtight security: Prevent access based on authentication status
+    if (requireAuth && !isAuthenticated) {
+      // User trying to access protected route without being authenticated
+      setHasRedirected(true)
+      router.replace('/login')
       return
     }
 
-    if (!requireAuth && token && user) {
-      router.push('/dashboard')
+    if (!requireAuth && isAuthenticated) {
+      // Logged in user trying to access public route (like login page)
+      setHasRedirected(true)
+      router.replace('/dashboard')
       return
     }
 
-    setIsLoading(false)
-  }, [user, router, requireAuth, isMounted])
+    // Route is accessible, stop loading
+    setIsRouteLoading(false)
+  }, [user, isLoading, isMounted, router, requireAuth, hasRedirected])
 
-  if (!isMounted || isLoading) {
+  // Show loading screen while checking authentication or redirecting
+  if (!isMounted || isLoading || isRouteLoading || hasRedirected) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>

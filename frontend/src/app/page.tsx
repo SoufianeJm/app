@@ -6,18 +6,20 @@ import { useAuth } from "@/context/AuthContext";
 import Cookies from "js-cookie";
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, isLoading, isMounted } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    if (!isMounted || isLoading) return;
+
     const token = Cookies.get('token');
-    
+
     if (token && user) {
-      router.push('/dashboard');
+      router.replace('/dashboard');
     } else {
-      router.push('/login');
+      router.replace('/login');
     }
-  }, [user, router]);
+  }, [user, router, isLoading, isMounted]);
 
   // Show loading while redirecting
   return (

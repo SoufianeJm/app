@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.AuthResponse;
 import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.RegisterRequest;
 import com.example.demo.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,15 +26,6 @@ public class AuthController {
         }
     }
     
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        try {
-            AuthResponse response = authService.register(request);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
     
     @GetMapping("/test")
     public ResponseEntity<String> test() {

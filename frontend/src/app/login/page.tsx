@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -25,7 +24,7 @@ function LoginForm() {
     
     try {
       await login(email, password)
-      router.push('/dashboard')
+      router.replace('/dashboard')
     } catch (error: any) {
       setError(error.response?.data?.message || 'Invalid email or password')
     } finally {
@@ -55,7 +54,7 @@ function LoginForm() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="John@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -76,12 +75,6 @@ function LoginForm() {
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Signing in...' : 'Sign in'}
               </Button>
-              <div className="text-sm text-center text-gray-600">
-                Don't have an account?{' '}
-                <Link href="/register" className="text-blue-600 hover:underline">
-                  Sign up
-                </Link>
-              </div>
             </CardFooter>
           </form>
         </Card>
@@ -92,7 +85,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <RouteGuard>
+    <RouteGuard requireAuth={false}>
       <LoginForm />
     </RouteGuard>
   )

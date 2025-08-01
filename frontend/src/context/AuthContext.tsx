@@ -54,8 +54,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
-    Cookies.remove("token");
+    Cookies.remove('token');
     setUser(null);
+    // Force redirect to login after logout
+    window.location.href = '/login';
   };
 
   return (
