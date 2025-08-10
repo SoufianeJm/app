@@ -213,7 +213,7 @@ export default function EmployeeForm({ open, onClose, onSubmit, employee, depart
                     <SelectValue placeholder="Select department" />
                   </SelectTrigger>
                   <SelectContent>
-                    {departments.map((dept) => (
+                    {departments.filter(dept => dept !== 'All').map((dept) => (
                       <SelectItem key={dept} value={dept}>
                         {dept}
                       </SelectItem>

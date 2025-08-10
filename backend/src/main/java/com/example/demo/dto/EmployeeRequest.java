@@ -41,13 +41,13 @@ public class EmployeeRequest {
     @Size(max = 20, message = "Phone number must not exceed 20 characters")
     private String phoneNumber;
     
-    private LocalDateTime hireDate;
+    // Accept date as string to handle frontend date picker format (YYYY-MM-DD)
+    private String hireDate;
     
     @Size(max = 1000, message = "Profile must not exceed 1000 characters")
     private String profile;
     
-    // Password for creating new employees
-    @NotBlank(message = "Password is required")
+    // Password for creating new employees (optional for updates)
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 }

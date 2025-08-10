@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { authApi } from '@/lib/api'
+import { authApi, fetchAllDepartments, Department } from '@/lib/api'
 import RouteGuard from '@/components/RouteGuard'
 import {
   BarChart,
@@ -53,11 +53,78 @@ const kpiData = [
 function Dashboard() {
   const { user, logout } = useAuth()
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [departments, setDepartments] = useState<Department[]>([])
+  const [loadingDepartments, setLoadingDepartments] = useState(true)
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentDate(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    loadDepartments()
+  }, [])
+
+  const loadDepartments = async () => {
+    try {
+      setLoadingDepartments(true)
+      const response = await fetchAllDepartments()
+      if (response.success) {
+        setDepartments(response.data)
+      }
+    } catch (error) {
+      console.error('Error loading departments:', error)
+    } finally {
+      setLoadingDepartments(false)
+    }
+  }
+
+  const getDepartmentIcon = (department: Department) => {
+    return <Building2 className="w-5 h-5 text-white" />
+  }
+
+  const getDepartmentBgColor = (iconColor: string) => {
+    // Convert hex color to Tailwind background color classes
+    const colorMap: { [key: string]: string } = {
+      '#3B82F6': 'bg-blue-500',
+      '#10B981': 'bg-green-500', 
+      '#8B5CF6': 'bg-purple-500',
+      '#F59E0B': 'bg-yellow-500',
+      '#EF4444': 'bg-red-500',
+      '#06B6D4': 'bg-cyan-500',
+      '#EC4899': 'bg-pink-500',
+      '#84CC16': 'bg-lime-500'
+    }
+    return colorMap[iconColor] || 'bg-blue-500'
+  }
+
+  const getBorderColor = (iconColor: string) => {
+    const colorMap: { [key: string]: string } = {
+      '#3B82F6': 'border-blue-100 bg-blue-50',
+      '#10B981': 'border-green-100 bg-green-50',
+      '#8B5CF6': 'border-purple-100 bg-purple-50',
+      '#F59E0B': 'border-yellow-100 bg-yellow-50',
+      '#EF4444': 'border-red-100 bg-red-50',
+      '#06B6D4': 'border-cyan-100 bg-cyan-50',
+      '#EC4899': 'border-pink-100 bg-pink-50',
+      '#84CC16': 'border-lime-100 bg-lime-50'
+    }
+    return colorMap[iconColor] || 'border-blue-100 bg-blue-50'
+  }
+
+  const getBadgeColor = (iconColor: string) => {
+    const colorMap: { [key: string]: string } = {
+      '#3B82F6': 'bg-blue-100 text-blue-800',
+      '#10B981': 'bg-green-100 text-green-800',
+      '#8B5CF6': 'bg-purple-100 text-purple-800',
+      '#F59E0B': 'bg-yellow-100 text-yellow-800',
+      '#EF4444': 'bg-red-100 text-red-800',
+      '#06B6D4': 'bg-cyan-100 text-cyan-800',
+      '#EC4899': 'bg-pink-100 text-pink-800',
+      '#84CC16': 'bg-lime-100 text-lime-800'
+    }
+    return colorMap[iconColor] || 'bg-blue-100 text-blue-800'
+  }
 
   if (!user) {
     return <div>Loading...</div>
@@ -187,75 +254,51 @@ function Dashboard() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Departments</CardTitle>
-                  <button className="text-sm text-blue-600 hover:text-blue-700">See All</button>
+                  <a href="/departments" className="text-sm text-blue-600 hover:text-blue-700">See All</a>
                 </div>
                 <div className="flex items-baseline space-x-2">
-                  <span className="text-3xl font-bold">12</span>
+                  <span className="text-3xl font-bold">{loadingDepartments ? '...' : departments.length}</span>
                   <span className="text-gray-600 text-sm">Total Departments</span>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Engineering Department */}
-                  <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <Badge className="bg-blue-100 text-blue-800 text-xs">45 Members</Badge>
-                    </div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Engineering</h3>
-                    <p className="text-sm text-gray-600">Software Development & DevOps</p>
+                {loadingDepartments ? (
+                  <div className="flex justify-center items-center py-8">
+                    <div className="text-gray-500">Loading departments...</div>
                   </div>
-
-                  {/* Marketing Department */}
-                  <div className="p-4 bg-green-50 rounded-xl border border-green-100">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-                        </svg>
-                      </div>
-                      <Badge className="bg-green-100 text-green-800 text-xs">28 Members</Badge>
+                ) : departments.length > 0 ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      {departments.slice(0, 4).map((department) => (
+                        <div key={department.id} className={`p-4 rounded-xl border ${getBorderColor(department.iconColor)}`}>
+                          <div className="flex items-center justify-between mb-3">
+                            <div className={`w-10 h-10 ${getDepartmentBgColor(department.iconColor)} rounded-lg flex items-center justify-center`}>
+                              {getDepartmentIcon(department)}
+                            </div>
+                            <Badge className={`text-xs ${getBadgeColor(department.iconColor)}`}>
+                              {department.employeeCount} Members
+                            </Badge>
+                          </div>
+                          <h3 className="font-semibold text-gray-900 mb-1">{department.name}</h3>
+                          <p className="text-sm text-gray-600">{department.description}</p>
+                        </div>
+                      ))}
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Marketing</h3>
-                    <p className="text-sm text-gray-600">Digital Marketing & Brand</p>
-                  </div>
 
-                  {/* Sales Department */}
-                  <div className="p-4 bg-purple-50 rounded-xl border border-purple-100">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                        </svg>
+                    {/* See More Departments */}
+                    {departments.length > 4 && (
+                      <div className="mt-4 p-3 bg-gray-50 rounded-lg text-center">
+                        <p className="text-sm text-gray-600 font-medium">+{departments.length - 4} more departments</p>
+                        <a href="/departments" className="text-xs text-blue-500 hover:text-blue-700 mt-1 inline-block">View all departments →</a>
                       </div>
-                      <Badge className="bg-purple-100 text-purple-800 text-xs">32 Members</Badge>
-                    </div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Sales</h3>
-                    <p className="text-sm text-gray-600">Business Development</p>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">No departments found</p>
                   </div>
-
-                  {/* HR Department */}
-                  <div className="p-4 bg-orange-50 rounded-xl border border-orange-100">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                        <Users className="w-5 h-5 text-white" />
-                      </div>
-                      <Badge className="bg-orange-100 text-orange-800 text-xs">18 Members</Badge>
-                    </div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Human Resources</h3>
-                    <p className="text-sm text-gray-600">Talent & Operations</p>
-                  </div>
-                </div>
-
-                {/* See More Departments */}
-                <div className="mt-4 p-3 bg-gray-50 rounded-lg text-center">
-                  <p className="text-sm text-gray-600 font-medium">+8 more departments</p>
-                  <button className="text-xs text-blue-500 hover:text-blue-700 mt-1">View all departments →</button>
-                </div>
+                )}
               </CardContent>
             </Card>
           </div>

@@ -16,7 +16,7 @@ import {
   createEmployee,
   updateEmployee,
   deleteEmployee,
-  fetchDepartments
+  fetchAllDepartments
 } from '@/lib/api'
 import {
   Users,
@@ -53,12 +53,31 @@ function EmployeePage() {
   useEffect(() => {
     const loadData = async () => {
       try {
+        // Load employees
         const employeesData = await fetchEmployees()
-        const departmentsData = await fetchDepartments()
         setEmployees(employeesData)
-        setDepartments(['All', ...departmentsData])
+        
+        // Load departments from the Departments API
+        try {
+          const departmentsResponse = await fetchAllDepartments()
+          if (departmentsResponse.success && departmentsResponse.data.length > 0) {
+            const departmentNames = departmentsResponse.data.map(dept => dept.name)
+            setDepartments(['All', ...departmentNames])
+          } else {
+            // Fallback to employee departments endpoint
+            const departmentsData = await fetch('/api/employees/departments').then(res => res.json())
+            const allDepts = departmentsData.length > 0 ? departmentsData : ['Engineering & Technology', 'Human Resources', 'Marketing & Sales', 'Finance', 'Operations']
+            setDepartments(['All', ...allDepts])
+          }
+        } catch (depError) {
+          console.error('Failed to fetch departments:', depError)
+          // Final fallback to default departments
+          setDepartments(['All', 'Engineering & Technology', 'Human Resources', 'Marketing & Sales', 'Finance', 'Operations'])
+        }
       } catch (error) {
         console.error('Failed to fetch employees:', error)
+        // Fallback to default departments on error
+        setDepartments(['All', 'Engineering & Technology', 'Human Resources', 'Marketing & Sales', 'Finance', 'Operations'])
       } finally {
         setLoading(false)
       }
@@ -220,9 +239,13 @@ const handleAddNew = () => {
           onClose={() => setEmployeeFormOpen(false)}
           onSubmit={async (data) => {
             try {
-              // Transform form data to API format
+              // Transform form data to API format (only include fields backend expects)
               const apiData = {
-                ...data,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                position: data.position,
+                email: data.email,
+                department: data.department,
                 phoneNumber: data.phone,
                 hireDate: data.startDate,
                 profile: data.notes,
@@ -230,14 +253,21 @@ const handleAddNew = () => {
               }
               
               if (formMode === 'create') {
-                await createEmployee(apiData as CreateEmployeeRequest)
+                // Add password for new employees
+                const createData = { ...apiData, password: 'temp123' }
+                console.log('Creating employee with data:', createData)
+                await createEmployee(createData as CreateEmployeeRequest)
               } else if (formMode === 'edit') {
+                // Don't send password for updates
+                console.log('Updating employee with data:', apiData)
                 await updateEmployee(selectedEmployee!.id, apiData as UpdateEmployeeRequest)
               }
               const employees = await fetchEmployees()
               setEmployees(employees)
             } catch (error) {
               console.error('Error saving employee:', error)
+              // Show user-friendly error message
+              alert('Failed to save employee. Please check that all required fields are filled correctly.')
             }
           }}
           employee={selectedEmployee}

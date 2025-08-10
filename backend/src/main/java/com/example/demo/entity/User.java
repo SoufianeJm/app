@@ -39,6 +39,7 @@ public class User implements UserDetails {
     private String lastName;
     
     @Enumerated(EnumType.STRING)
+    @Column(name = "role", length = 20)
     private Role role = Role.MANAGER;
     
     @Column(name = "is_active")

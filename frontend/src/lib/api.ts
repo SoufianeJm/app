@@ -217,4 +217,116 @@ export const deleteEmployee = employeeApi.deleteEmployee;
 export const searchEmployees = employeeApi.searchEmployees;
 export const fetchDepartments = employeeApi.getAllDepartments;
 
+// Department interfaces
+export interface Department {
+  id: number;
+  name: string;
+  description: string;
+  managerId?: number;
+  manager?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  budget: number;
+  location: string;
+  establishedDate: string;
+  iconColor: string;
+  isActive: boolean;
+  employeeCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateDepartmentRequest {
+  name: string;
+  description: string;
+  managerId?: number;
+  budget: number;
+  location: string;
+  establishedDate: string;
+  iconColor: string;
+  isActive?: boolean;
+}
+
+export interface UpdateDepartmentRequest {
+  name: string;
+  description: string;
+  managerId?: number;
+  budget: number;
+  location: string;
+  establishedDate: string;
+  iconColor: string;
+  isActive?: boolean;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+  meta?: any;
+  timestamp: string;
+}
+
+// Department API calls
+export const departmentApi = {
+  getAllDepartments: async (params?: {
+    page?: number;
+    size?: number;
+    sortBy?: string;
+    sortDir?: string;
+    search?: string;
+  }): Promise<ApiResponse<Department[]>> => {
+    const queryParams = new URLSearchParams();
+    if (params?.page !== undefined) queryParams.append('page', params.page.toString());
+    if (params?.size !== undefined) queryParams.append('size', params.size.toString());
+    if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+    if (params?.sortDir) queryParams.append('sortDir', params.sortDir);
+    if (params?.search) queryParams.append('search', params.search);
+    
+    const response = await api.get(`/departments?${queryParams.toString()}`);
+    return response.data;
+  },
+
+  getDepartmentById: async (id: number): Promise<ApiResponse<Department>> => {
+    const response = await api.get(`/departments/${id}`);
+    return response.data;
+  },
+
+  createDepartment: async (data: CreateDepartmentRequest): Promise<ApiResponse<Department>> => {
+    const response = await api.post('/departments', data);
+    return response.data;
+  },
+
+  updateDepartment: async (id: number, data: UpdateDepartmentRequest): Promise<ApiResponse<Department>> => {
+    const response = await api.put(`/departments/${id}`, data);
+    return response.data;
+  },
+
+  deleteDepartment: async (id: number): Promise<ApiResponse<string>> => {
+    const response = await api.delete(`/departments/${id}`);
+    return response.data;
+  },
+
+  searchDepartments: async (searchTerm: string): Promise<ApiResponse<Department[]>> => {
+    const response = await api.get(`/departments?search=${encodeURIComponent(searchTerm)}`);
+    return response.data;
+  },
+
+  getDepartmentsByManager: async (managerId: number): Promise<ApiResponse<Department[]>> => {
+    const response = await api.get(`/departments/manager/${managerId}`);
+    return response.data;
+  },
+};
+
+// Export individual department functions for convenience
+export const fetchAllDepartments = departmentApi.getAllDepartments;
+export const fetchDepartmentById = departmentApi.getDepartmentById;
+export const createDepartment = departmentApi.createDepartment;
+export const updateDepartment = departmentApi.updateDepartment;
+export const deleteDepartment = departmentApi.deleteDepartment;
+export const searchDepartments = departmentApi.searchDepartments;
+export const fetchDepartmentsByManager = departmentApi.getDepartmentsByManager;
+
 export default api;
