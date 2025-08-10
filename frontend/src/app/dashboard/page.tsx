@@ -23,18 +23,14 @@ import {
   Cell
 } from 'recharts'
 import { 
-  Calendar,
   Users,
-  UserPlus,
-  UserMinus,
-  Clock,
-  TrendingUp,
   Search,
   Bell,
   Settings,
   HelpCircle,
   MessageSquare,
-  MoreHorizontal
+  LayoutDashboard,
+  Building2
 } from 'lucide-react'
 
 // Hardcoded data
@@ -53,21 +49,6 @@ const kpiData = [
   { name: 'Dec', value: 94 }
 ]
 
-const timeWorkedData = [
-  { name: 'Nov 02, 2024', hours: 8 },
-  { name: 'Nov 03, 2024', hours: 7.5 },
-  { name: 'Nov 04, 2024', hours: 8.5 },
-  { name: 'Nov 05, 2024', hours: 8 },
-  { name: 'Nov 06, 2024', hours: 7 },
-  { name: 'Nov 07, 2024', hours: 8.5 },
-  { name: 'Nov 08, 2024', hours: 9 }
-]
-
-const employmentStatusData = [
-  { name: 'Permanent', value: 324, color: '#8b5cf6' },
-  { name: 'Contract', value: 121, color: '#10b981' },
-  { name: 'Probation', value: 72, color: '#f59e0b' }
-]
 
 function Dashboard() {
   const { user, logout } = useAuth()
@@ -94,51 +75,19 @@ function Dashboard() {
         </div>
         
         <nav className="space-y-1">
-          <a href="#" className="flex items-center px-3 py-2 bg-gray-100 text-gray-900 rounded-lg">
-            <Users className="w-5 h-5 mr-3" />
+          <a href="/dashboard" className="flex items-center px-3 py-2 bg-gray-100 text-gray-900 rounded-lg">
+            <LayoutDashboard className="w-5 h-5 mr-3" />
             Dashboard
           </a>
-          <a href="#" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-            <Calendar className="w-5 h-5 mr-3" />
-            Schedule
-          </a>
-          <a href="#" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+          <a href="/employees" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
             <Users className="w-5 h-5 mr-3" />
-            Projects
+            Employees
           </a>
-          <a href="#" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-            <Clock className="w-5 h-5 mr-3" />
-            Reports
-          </a>
-          <a href="#" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-            <MessageSquare className="w-5 h-5 mr-3" />
-            Notes
-          </a>
-          <a href="#" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-            <TrendingUp className="w-5 h-5 mr-3" />
-            Benefits
-            <Badge className="ml-auto bg-blue-100 text-blue-800 text-xs">NEW</Badge>
+          <a href="/departments" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+            <Building2 className="w-5 h-5 mr-3" />
+            Departments
           </a>
         </nav>
-
-        <div className="mt-8 pt-8 border-t border-gray-200 space-y-1">
-          <a href="#" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-            <Users className="w-5 h-5 mr-3" />
-            Job
-          </a>
-          <a href="#" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-            <UserPlus className="w-5 h-5 mr-3" />
-            Candidate
-          </a>
-          <a href="#" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-            <Users className="w-5 h-5 mr-3" />
-            Company
-          </a>
-          <a href="#" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-            <Clock className="w-5 h-5 mr-3" />
-            Payment
-          </a>
-        </div>
 
         <div className="absolute bottom-4 left-4 right-4 space-y-1">
           <a href="#" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
@@ -233,134 +182,186 @@ function Dashboard() {
               </Card>
             </div>
             
-            {/* KPI Performance Chart */}
+            {/* Departments List */}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>KPI Performance</CardTitle>
-                  <select className="border border-gray-300 rounded px-3 py-1 text-sm">
-                    <option>Last Year</option>
-                  </select>
+                  <CardTitle>Departments</CardTitle>
+                  <button className="text-sm text-blue-600 hover:text-blue-700">See All</button>
                 </div>
                 <div className="flex items-baseline space-x-2">
-                  <span className="text-3xl font-bold">91.72%</span>
-                  <span className="text-green-600 text-sm">+24% vs last month</span>
+                  <span className="text-3xl font-bold">12</span>
+                  <span className="text-gray-600 text-sm">Total Departments</span>
                 </div>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={kpiData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                    <YAxis hide />
-                    <Tooltip />
-                    <Bar dataKey="value" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Engineering Department */}
+                  <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <Badge className="bg-blue-100 text-blue-800 text-xs">45 Members</Badge>
+                    </div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Engineering</h3>
+                    <p className="text-sm text-gray-600">Software Development & DevOps</p>
+                  </div>
+
+                  {/* Marketing Department */}
+                  <div className="p-4 bg-green-50 rounded-xl border border-green-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                        </svg>
+                      </div>
+                      <Badge className="bg-green-100 text-green-800 text-xs">28 Members</Badge>
+                    </div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Marketing</h3>
+                    <p className="text-sm text-gray-600">Digital Marketing & Brand</p>
+                  </div>
+
+                  {/* Sales Department */}
+                  <div className="p-4 bg-purple-50 rounded-xl border border-purple-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                      </div>
+                      <Badge className="bg-purple-100 text-purple-800 text-xs">32 Members</Badge>
+                    </div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Sales</h3>
+                    <p className="text-sm text-gray-600">Business Development</p>
+                  </div>
+
+                  {/* HR Department */}
+                  <div className="p-4 bg-orange-50 rounded-xl border border-orange-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                        <Users className="w-5 h-5 text-white" />
+                      </div>
+                      <Badge className="bg-orange-100 text-orange-800 text-xs">18 Members</Badge>
+                    </div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Human Resources</h3>
+                    <p className="text-sm text-gray-600">Talent & Operations</p>
+                  </div>
+                </div>
+
+                {/* See More Departments */}
+                <div className="mt-4 p-3 bg-gray-50 rounded-lg text-center">
+                  <p className="text-sm text-gray-600 font-medium">+8 more departments</p>
+                  <button className="text-xs text-blue-500 hover:text-blue-700 mt-1">View all departments →</button>
+                </div>
               </CardContent>
             </Card>
           </div>
           
-          {/* Right Section - Schedule */}
+          {/* Right Section - Employee List */}
           <div className="col-span-1">
             <Card className="bg-white border border-gray-200 rounded-2xl shadow-sm h-full">
               <CardContent className="p-6">
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900">Schedule</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Employees</h3>
                     <div className="flex items-center space-x-2">
                       <Search className="w-4 h-4 text-gray-400" />
                       <button className="text-sm text-blue-600">See All</button>
                     </div>
                   </div>
-                  
-                  {/* Calendar Navigation */}
-                  <div className="flex items-center justify-between mb-4">
-                    <button className="p-1">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                      </svg>
-                    </button>
-                    <span className="font-medium text-gray-900">October 2024</span>
-                    <button className="p-1">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  </div>
-                  
-                  {/* Calendar Days */}
-                  <div className="flex justify-between mb-6">
-                    <div className="text-center">
-                      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-sm font-medium mb-1">31</div>
-                      <div className="text-xs text-gray-500">Thu</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-sm font-medium mb-1">01</div>
-                      <div className="text-xs text-gray-500">Fri</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center text-sm font-medium mb-1">02</div>
-                      <div className="text-xs text-blue-600 font-medium">Sat</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-sm font-medium mb-1">03</div>
-                      <div className="text-xs text-gray-500">Sun</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-sm font-medium mb-1">04</div>
-                      <div className="text-xs text-gray-500">Mon</div>
-                    </div>
-                  </div>
-                  
-                  {/* Tabs */}
-                  <div className="flex space-x-6 mb-4 border-b border-gray-200">
-                    <button className="text-sm font-medium text-gray-900 border-b-2 border-gray-900 pb-3">Meetings</button>
-                    <button className="text-sm text-gray-500 pb-3">Events</button>
-                    <button className="text-sm text-gray-500 pb-3">Holiday</button>
-                  </div>
-                  
-                  {/* Meetings List */}
-                  <div className="space-y-3">
-                    <div className="p-3 bg-purple-50 rounded-lg relative">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="text-sm font-medium text-purple-700">Product Design</div>
-                        <button className="text-gray-400">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </button>
+
+                  {/* Employee List */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src="https://i.pravatar.cc/40?img=5" alt="Anna Smith" />
+                          <AvatarFallback>AS</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Anna Smith</p>
+                          <p className="text-xs text-gray-500">Software Engineer</p>
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-600 mb-1">Meeting with Arthur Bell</div>
-                      <div className="text-xs text-gray-500 mb-1">09:00 - 09:45 AM (UTC)</div>
-                      <div className="text-xs text-gray-500 mb-3">On Google Meet</div>
-                      <div className="flex -space-x-1">
-                        <Avatar className="w-6 h-6 border-2 border-white">
-                          <AvatarImage src="https://i.pravatar.cc/24?img=2" />
-                          <AvatarFallback>AB</AvatarFallback>
-                        </Avatar>
-                        <Avatar className="w-6 h-6 border-2 border-white">
-                          <AvatarImage src="https://i.pravatar.cc/24?img=3" />
-                          <AvatarFallback>CD</AvatarFallback>
-                        </Avatar>
-                        <Avatar className="w-6 h-6 border-2 border-white">
-                          <AvatarImage src="https://i.pravatar.cc/24?img=4" />
-                          <AvatarFallback>EF</AvatarFallback>
-                        </Avatar>
-                        <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-xs border-2 border-white">+3</div>
-                      </div>
+                      <Badge className="bg-green-100 text-green-800 text-xs">Active</Badge>
                     </div>
                     
-                    <div className="p-3 bg-orange-50 rounded-lg relative">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="text-sm font-medium text-orange-700">Brainstorming Session</div>
-                        <button className="text-gray-400">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </button>
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src="https://i.pravatar.cc/40?img=6" alt="John Doe" />
+                          <AvatarFallback>JD</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">John Doe</p>
+                          <p className="text-xs text-gray-500">Product Manager</p>
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-600">Meeting with Leslie Perez</div>
+                      <Badge className="bg-green-100 text-green-800 text-xs">Active</Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src="https://i.pravatar.cc/40?img=7" alt="Emily Davis" />
+                          <AvatarFallback>ED</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Emily Davis</p>
+                          <p className="text-xs text-gray-500">UX Designer</p>
+                        </div>
+                      </div>
+                      <Badge className="bg-green-100 text-green-800 text-xs">Active</Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src="https://i.pravatar.cc/40?img=8" alt="Michael Chen" />
+                          <AvatarFallback>MC</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Michael Chen</p>
+                          <p className="text-xs text-gray-500">DevOps Engineer</p>
+                        </div>
+                      </div>
+                      <Badge className="bg-yellow-100 text-yellow-800 text-xs">Away</Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src="https://i.pravatar.cc/40?img=9" alt="Sarah Wilson" />
+                          <AvatarFallback>SW</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Sarah Wilson</p>
+                          <p className="text-xs text-gray-500">Marketing Manager</p>
+                        </div>
+                      </div>
+                      <Badge className="bg-green-100 text-green-800 text-xs">Active</Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src="https://i.pravatar.cc/40?img=10" alt="David Rodriguez" />
+                          <AvatarFallback>DR</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">David Rodriguez</p>
+                          <p className="text-xs text-gray-500">Data Analyst</p>
+                        </div>
+                      </div>
+                      <Badge className="bg-green-100 text-green-800 text-xs">Active</Badge>
+                    </div>
+                    
+                    <div className="mt-4 p-3 bg-blue-50 rounded-lg text-center">
+                      <p className="text-sm text-blue-600 font-medium">+212 more employees</p>
+                      <button className="text-xs text-blue-500 hover:text-blue-700 mt-1">View all employees →</button>
                     </div>
                   </div>
                 </div>
@@ -369,87 +370,6 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Bottom Row */}
-<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Total Time Worked */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Total Time Worked</CardTitle>
-                <select className="border border-gray-300 rounded px-3 py-1 text-sm">
-                  <option>Weekly View</option>
-                </select>
-              </div>
-              <div className="flex items-baseline space-x-2">
-                <span className="text-3xl font-bold">12hr 32min</span>
-                <span className="text-green-600 text-sm">+12% vs last month</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={150}>
-                <LineChart data={timeWorkedData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis hide />
-                  <YAxis hide />
-                  <Tooltip />
-                  <Line 
-                    type="monotone" 
-                    dataKey="hours" 
-                    stroke="#8b5cf6" 
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-              <div className="flex justify-between text-xs text-gray-500 mt-2">
-                <span>Nov 02, 2024</span>
-                <span>19th: 40min Total Time</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Employment Status */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Employment Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between mb-4">
-                <div className="text-right">
-                  <span className="text-sm text-gray-500">0%</span>
-                </div>
-                <div className="flex-1 mx-4">
-                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-red-400 via-yellow-400 via-green-400 to-blue-400"></div>
-                  </div>
-                </div>
-                <div className="text-left">
-                  <span className="text-sm text-gray-500">100%</span>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center">
-                  <div className="w-3 h-3 bg-purple-500 rounded-full mx-auto mb-1"></div>
-                  <div className="text-2xl font-bold">324</div>
-                  <div className="text-sm text-gray-500">Permanent</div>
-                  <div className="text-xs text-gray-400">48%</div>
-                </div>
-                <div className="text-center">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mx-auto mb-1"></div>
-                  <div className="text-2xl font-bold">121</div>
-                  <div className="text-sm text-gray-500">Contract</div>
-                  <div className="text-xs text-gray-400">32%</div>
-                </div>
-                <div className="text-center">
-                  <div className="w-3 h-3 bg-red-500 rounded-full mx-auto mb-1"></div>
-                  <div className="text-2xl font-bold">72</div>
-                  <div className="text-sm text-gray-500">Probation</div>
-                  <div className="text-xs text-gray-400">20%</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   )

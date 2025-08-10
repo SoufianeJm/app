@@ -1,0 +1,232 @@
+package com.example.demo;
+
+import com.example.demo.dto.EmployeeRequest;
+import com.example.demo.entity.Employee;
+import com.example.demo.repository.EmployeeRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
+
+import java.time.LocalDateTime;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@SpringBootTest
+@AutoConfigureWebMvc
+@ActiveProfiles("test")
+@Transactional
+public class EmployeeIntegrationTest {
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private MockMvc mockMvc;
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        employeeRepository.deleteAll();
+    }
+
+    @Test
+    void testGetAllEmployees() throws Exception {
+        // Create test employee
+        createTestEmployee("Test Employee", "test@example.com");
+
+        mockMvc.perform(get("/api/employees"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))))
+                .andExpect(jsonPath("$[0].name", is("Test Employee")))
+                .andExpect(jsonPath("$[0].email", is("test@example.com")));
+    }
+
+    @Test
+    void testGetEmployeeById() throws Exception {
+        Employee employee = createTestEmployee("Test Employee", "test@example.com");
+
+        mockMvc.perform(get("/api/employees/{id}", employee.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name", is("Test Employee")))
+                .andExpect(jsonPath("$.email", is("test@example.com")));
+    }
+
+    @Test
+    void testGetEmployeeByIdNotFound() throws Exception {
+        mockMvc.perform(get("/api/employees/999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testCreateEmployee() throws Exception {
+        EmployeeRequest request = new EmployeeRequest();
+        request.setName("New Employee");
+        request.setPosition("Software Developer");
+        request.setEmail("new@example.com");
+        request.setDepartment("Engineering");
+        request.setStatus(Employee.Status.ACTIVE);
+
+        mockMvc.perform(post("/api/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name", is("New Employee")))
+                .andExpect(jsonPath("$.email", is("new@example.com")))
+                .andExpect(jsonPath("$.position", is("Software Developer")))
+                .andExpect(jsonPath("$.department", is("Engineering")))
+                .andExpect(jsonPath("$.status", is("ACTIVE")));
+    }
+
+    @Test
+    void testCreateEmployeeWithDuplicateEmail() throws Exception {
+        createTestEmployee("Existing Employee", "existing@example.com");
+
+        EmployeeRequest request = new EmployeeRequest();
+        request.setName("Duplicate Employee");
+        request.setPosition("Manager");
+        request.setEmail("existing@example.com");
+        request.setDepartment("Management");
+
+        mockMvc.perform(post("/api/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testUpdateEmployee() throws Exception {
+        Employee employee = createTestEmployee("Original Name", "original@example.com");
+
+        EmployeeRequest request = new EmployeeRequest();
+        request.setName("Updated Name");
+        request.setPosition("Senior Developer");
+        request.setEmail("updated@example.com");
+        request.setDepartment("Engineering");
+        request.setStatus(Employee.Status.ACTIVE);
+
+        mockMvc.perform(put("/api/employees/{id}", employee.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name", is("Updated Name")))
+                .andExpect(jsonPath("$.email", is("updated@example.com")))
+                .andExpect(jsonPath("$.position", is("Senior Developer")));
+    }
+
+    @Test
+    void testUpdateEmployeeNotFound() throws Exception {
+        EmployeeRequest request = new EmployeeRequest();
+        request.setName("Updated Name");
+        request.setPosition("Manager");
+        request.setEmail("updated@example.com");
+        request.setDepartment("Management");
+
+        mockMvc.perform(put("/api/employees/999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testDeleteEmployee() throws Exception {
+        Employee employee = createTestEmployee("To Delete", "delete@example.com");
+
+        mockMvc.perform(delete("/api/employees/{id}", employee.getId()))
+                .andExpect(status().isNoContent());
+
+        // Verify employee was deleted
+        mockMvc.perform(get("/api/employees/{id}", employee.getId()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testDeleteEmployeeNotFound() throws Exception {
+        mockMvc.perform(delete("/api/employees/999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testSearchEmployees() throws Exception {
+        createTestEmployee("John Smith", "john@example.com");
+        createTestEmployee("Jane Doe", "jane@example.com");
+
+        mockMvc.perform(get("/api/employees?search=John"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].name", is("John Smith")));
+    }
+
+    @Test
+    void testGetEmployeesByDepartment() throws Exception {
+        createTestEmployeeWithDepartment("Employee 1", "emp1@example.com", "Engineering");
+        createTestEmployeeWithDepartment("Employee 2", "emp2@example.com", "Marketing");
+
+        mockMvc.perform(get("/api/employees?department=Engineering"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].department", is("Engineering")));
+    }
+
+    @Test
+    void testGetAllDepartments() throws Exception {
+        createTestEmployeeWithDepartment("Employee 1", "emp1@example.com", "Engineering");
+        createTestEmployeeWithDepartment("Employee 2", "emp2@example.com", "Marketing");
+
+        mockMvc.perform(get("/api/employees/departments"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$", containsInAnyOrder("Engineering", "Marketing")));
+    }
+
+    @Test
+    void testApiTest() throws Exception {
+        mockMvc.perform(get("/api/employees/test"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Employee API is working!"));
+    }
+
+    private Employee createTestEmployee(String name, String email) {
+        Employee employee = new Employee();
+        employee.setName(name);
+        employee.setPosition("Test Position");
+        employee.setEmail(email);
+        employee.setDepartment("Test Department");
+        employee.setStatus(Employee.Status.ACTIVE);
+        employee.setHireDate(LocalDateTime.now());
+        return employeeRepository.save(employee);
+    }
+
+    private Employee createTestEmployeeWithDepartment(String name, String email, String department) {
+        Employee employee = new Employee();
+        employee.setName(name);
+        employee.setPosition("Test Position");
+        employee.setEmail(email);
+        employee.setDepartment(department);
+        employee.setStatus(Employee.Status.ACTIVE);
+        employee.setHireDate(LocalDateTime.now());
+        return employeeRepository.save(employee);
+    }
+}

@@ -14,6 +14,9 @@ public class TestController {
     @GetMapping("/protected")
     public ResponseEntity<String> protectedEndpoint() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
         User user = (User) authentication.getPrincipal();
         return ResponseEntity.ok("Hello " + user.getEmail() + "! This is a protected endpoint.");
     }
@@ -21,6 +24,9 @@ public class TestController {
     @GetMapping("/user-info")
     public ResponseEntity<User> getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.status(401).build();
+        }
         User user = (User) authentication.getPrincipal();
         // Remove password from response for security
         user.setPassword(null);

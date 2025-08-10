@@ -30,23 +30,23 @@ public class RoleController {
         return ResponseEntity.ok(response);
     }
     
-    @GetMapping("/employer")
-    @PreAuthorize("hasRole('EMPLOYER') or hasRole('ADMIN')")
-    public ResponseEntity<Map<String, Object>> employerEndpoint() {
+    @GetMapping("/employee")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> employeeEndpoint() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         
         Map<String, Object> response = new HashMap<>();
-        response.put("message", "Welcome to the Employer Dashboard!");
+        response.put("message", "Welcome to the Employee Dashboard!");
         response.put("user", user.getEmail());
         response.put("role", user.getRole().name());
-        response.put("permissions", new String[]{"READ", "WRITE", "MANAGE_JOBS"});
+        response.put("permissions", new String[]{"READ", "VIEW_PROFILE"});
         
         return ResponseEntity.ok(response);
     }
     
     @GetMapping("/manager")
-    @PreAuthorize("hasRole('MANAGER') or hasRole('EMPLOYER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> managerEndpoint() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
@@ -75,26 +75,26 @@ public class RoleController {
         switch (role) {
             case ADMIN:
                 permissions.put("canAccessAdmin", true);
-                permissions.put("canAccessEmployer", true);
+                permissions.put("canAccessEmployee", true);
                 permissions.put("canAccessManager", true);
                 permissions.put("canManageUsers", true);
-                permissions.put("canManageJobs", true);
+                permissions.put("canManageEmployees", true);
                 permissions.put("canManageTeam", true);
                 break;
-            case EMPLOYER:
+            case EMPLOYEE:
                 permissions.put("canAccessAdmin", false);
-                permissions.put("canAccessEmployer", true);
-                permissions.put("canAccessManager", true);
+                permissions.put("canAccessEmployee", true);
+                permissions.put("canAccessManager", false);
                 permissions.put("canManageUsers", false);
-                permissions.put("canManageJobs", true);
+                permissions.put("canManageEmployees", false);
                 permissions.put("canManageTeam", false);
                 break;
             case MANAGER:
                 permissions.put("canAccessAdmin", false);
-                permissions.put("canAccessEmployer", false);
+                permissions.put("canAccessEmployee", true);
                 permissions.put("canAccessManager", true);
                 permissions.put("canManageUsers", false);
-                permissions.put("canManageJobs", false);
+                permissions.put("canManageEmployees", true);
                 permissions.put("canManageTeam", true);
                 break;
         }

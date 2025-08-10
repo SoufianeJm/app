@@ -1,6 +1,9 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -47,10 +50,31 @@ public class User implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
+    @Column(name = "position")
+    private String position;
+    
+    @Column(name = "department")
+    private String department;
+    
+    @Column(name = "phone_number")
+    private String phoneNumber;
+    
+    @Column(name = "hire_date")
+    private LocalDateTime hireDate;
+    
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+    
+    @Column(name = "profile", columnDefinition = "TEXT")
+    private String profile;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (hireDate == null) {
+            hireDate = LocalDateTime.now();
+        }
     }
     
     @PreUpdate
@@ -95,6 +119,40 @@ public class User implements UserDetails {
     }
     
     public enum Role {
-        ADMIN, EMPLOYER, MANAGER
+        ADMIN, EMPLOYEE, MANAGER
+    }
+    
+    // Helper methods for employee functionality
+    public String getFullName() {
+        if (firstName != null && lastName != null) {
+            return firstName + " " + lastName;
+        } else if (firstName != null) {
+            return firstName;
+        } else if (lastName != null) {
+            return lastName;
+        }
+        return email.split("@")[0]; // fallback to email prefix
+    }
+    
+    public String getPositionTitle() {
+        if (position != null && !position.trim().isEmpty()) {
+            return position;
+        }
+        // Fallback based on role
+        if (role == Role.ADMIN) {
+            return "Administrator";
+        } else if (role == Role.MANAGER) {
+            return "Manager";
+        } else {
+            return department != null ? department + " Employee" : "Employee";
+        }
+    }
+    
+    public String getDefaultAvatarUrl() {
+        if (avatarUrl != null && !avatarUrl.trim().isEmpty()) {
+            return avatarUrl;
+        }
+        // Generate a default avatar based on user ID
+        return "https://i.pravatar.cc/40?img=" + ((id != null ? id : 1) % 70 + 1);
     }
 }
