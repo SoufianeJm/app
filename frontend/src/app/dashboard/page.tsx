@@ -30,7 +30,8 @@ import {
   HelpCircle,
   MessageSquare,
   LayoutDashboard,
-  Building2
+  Building2,
+  Target
 } from 'lucide-react'
 
 // Hardcoded data
@@ -145,6 +146,10 @@ function Dashboard() {
           <a href="/dashboard" className="flex items-center px-3 py-2 bg-gray-100 text-gray-900 rounded-lg">
             <LayoutDashboard className="w-5 h-5 mr-3" />
             Dashboard
+          </a>
+          <a href="/manager" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+            <Target className="w-5 h-5 mr-3" />
+            Manager
           </a>
           <a href="/employees" className="flex items-center px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
             <Users className="w-5 h-5 mr-3" />
